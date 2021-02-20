@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -556,19 +557,22 @@ namespace FIRWinSyncDesign
 
             if (saveFileDialog.FileName != "")
             {
-                string[] data = new string[3];
-                data[0] = "Filter Order: " + NUM_TOTAL_SAMPLES + " Sampling Frequency (Hz): " + (1.0 / SAMPLE_TIME_S).ToString("F6") + " Cut-Off Frequency Lo (Hz): " + CUTOFF_FREQUENCY_HZ.ToString("F6") + " Cut-Off Frequency Hi (Hz): " + CUTOFF_FREQUENCY2_HZ.ToString("F6") + "\n\n";
+                CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US"); //Specifying culture, so that floating point numbers always have a dot (".") as a decimal separator.
+                                                                                    //Other cultures use a comma (",").
 
-                data[1] = windowedImpulseResponse[0].ToString("F7");
-                data[2] = "float coeff[] = {" + windowedImpulseResponse[0].ToString("F7") + "f";
+                string[] data = new string[3];
+                data[0] = "Filter Order: " + NUM_TOTAL_SAMPLES + " Sampling Frequency (Hz): " + (1.0 / SAMPLE_TIME_S).ToString("F6", culture) + " Cut-Off Frequency Lo (Hz): " + CUTOFF_FREQUENCY_HZ.ToString("F6", culture) + " Cut-Off Frequency Hi (Hz): " + CUTOFF_FREQUENCY2_HZ.ToString("F6", culture) + "\n\n";
+
+                data[1] = windowedImpulseResponse[0].ToString("F7", culture);
+                data[2] = "float coeff[] = {" + windowedImpulseResponse[0].ToString("F7", culture) + "f";
                 for (int n = 1; n < NUM_TOTAL_SAMPLES; n++)
                 {
-                    data[1] += "," + windowedImpulseResponse[n].ToString("F9");
-                    data[2] += "," + windowedImpulseResponse[n].ToString("F7") + "f";
+                    data[1] += "," + windowedImpulseResponse[n].ToString("F9", culture);
+                    data[2] += "," + windowedImpulseResponse[n].ToString("F7", culture) + "f";
                 }
                 data[1] += "\n\n";
                 data[2] += "};";
-                
+
                 System.IO.File.WriteAllLines(saveFileDialog.FileName, data);
                 MessageBox.Show("Coefficients written to file!", "Export Coefficients", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
